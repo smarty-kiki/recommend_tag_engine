@@ -1,7 +1,0 @@
-database_field:
-  type: varchar
-  length: $(length)
-  allow_null: true
-  default: null
-option:
-  length: 255

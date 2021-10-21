@@ -1,7 +1,0 @@
-data_type: enum
-validator:
-  yes: 是
-  no: 否
-display_name: 开关
-option:
-  length: 3

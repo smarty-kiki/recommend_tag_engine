@@ -31,21 +31,16 @@ if_has_exception(function ($ex) {
 
 if_verify(function ($action, $args) {
 
-    return unit_of_work(function () use ($action, $args){
+    $res = [
+        'code' => 0,
+        'msg'  => '',
+        'data' => call_user_func_array($action, $args),
+    ];
 
-        $res = [
-            'code' => 0,
-            'msg'  => '',
-            'data' => call_user_func_array($action, $args),
-        ];
+    header('Content-type: application/json');
 
-        header('Content-type: application/json');
-
-        return json($res);
-    });
+    return json($res);
 });
-
-// init interceptor
 
 // init 404 handler
 if_not_found(function () {
@@ -58,6 +53,7 @@ if_not_found(function () {
 
 // init controller
 include CONTROLLER_DIR.'/index.php';
+include CONTROLLER_DIR.'/good.php';
 
 // fix
 not_found();

@@ -1,7 +1,0 @@
-data_type: string
-validator:
-  - function: 'mb_strlen($value) <= $(length)'
-    failed_message: 不能超过 $(length) 字
-display_name: 名称
-option:
-  length: 30
