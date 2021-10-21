@@ -1,4 +1,4 @@
-# api_frame
+# mini_api_frame
 由 [frame](https://github.com/smarty-kiki/frame#frame) 框架衍生的单层 API 框架, 供快速开发使用
 
 ## 目录结构及文件说明
@@ -32,14 +32,14 @@
 │   ├── config (配置文件目录)  
 │   │   ├── development (开发环境)  
 │   │   │   ├── nginx (nginx 配置)  
-│   │   │   │   └── api_frame.conf (框架推荐的 nginx 配置)  
+│   │   │   │   └── mini_api_frame.conf (框架推荐的 nginx 配置)  
 │   │   │   └── supervisor  (supervisor 配置)  
-│   │   │       └── api_frame_queue_worker.conf (worker 的管理配置)  
+│   │   │       └── mini_api_frame_queue_worker.conf (worker 的管理配置)  
 │   │   └── production (线上环境)   
 │   │       ├── nginx  
-│   │       │   └── api_frame.conf  
+│   │       │   └── mini_api_frame.conf  
 │   │       └── supervisor  
-│   │           └── api_frame_queue_worker.conf  
+│   │           └── mini_api_frame_queue_worker.conf  
 │   ├── tool (工具脚本目录)  
 │   │   ├── classmap.sh (生成 ORM load 文件)  
 │   │   ├── naming_project.sh (快速修改本项目中的 nginx、supervisor 等配置中与项目目录有关的项目名称方便创建新项目使用)  
