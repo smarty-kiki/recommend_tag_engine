@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>推荐测试界面</title>
+    <style>
+    * {
+        margin: 0px;
+        vertical-align:top;
+        font-size: 12px;
+    }
+    html, body, form {
+        height:100%;
+    }
+    div {
+        margin: 5px;
+        width: 95%;
+    }
+    span {
+        margin-right: 3px;
+        padding: 1px 4px 1px 4px;
+    }
+    .selected {
+        background-color: #888;
+        color: white;
+    }
+    .unselect {
+        background-color: #ddd;
+    }
+    .count {
+        color: #ccc;
+    }
+    </style>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+</head>
+<body style="margin:0px;">
+    <form>
+        <table style="background-color:white; width:100%; height:100%">
+            <tr>
+                <td style="width:8%; background-color:#eee;">
+                    <table style="width:100%; height:100%">
+                        <tr>
+                            <td>
+                                我的标签：
+                                <div id="user_tags"></div>
+                                我的传染标签：
+                                <div id="trans_user_tags"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align:bottom;">
+                                获取数据：
+                                </br>
+                                <button>随机</button>
+                                <button>喜欢</button>
+                                </br>
+                                链接：
+                                <div id="good_list">
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="box-shadow: 0px 0px 5px 0px #888888;">
+                </td>
+                <td style="width:8%; background-color:#eee;">
+                </td>
+            </tr>
+        </table>
+    </form>
+</body>
+<script>
+    $(function () {
+
+        var $user_tags = $('#user_tags');
+        var $trans_user_tags = $('#trans_user_tags');
+
+        $('body').on('click', '.selected', function(){
+            var $this = $(this);
+            var tag_id = $this.attr('tag_id');
+            var tag_type = $this.attr('tag_type');
+            if (tag_type == 'user') {
+                $.post('/tag_targets/delete_from_user', {tag_id:tag_id}, function (res) {
+                    if (res.data) {
+                        $this.addClass('unselect');
+                        $this.removeClass('selected');
+                    }
+                });
+            }
+        });
+
+        $('body').on('click', '.unselect', function(){
+            var $this = $(this);
+            var tag_id = $this.attr('tag_id');
+            var tag_type = $this.attr('tag_type');
+            if (tag_type == 'user') {
+                $.post('/tag_targets/add_to_user', {tag_id:tag_id}, function (res) {
+                    if (res.data) {
+                        $this.addClass('selected');
+                        $this.removeClass('unselect');
+                    }
+                });
+            }
+        });
+
+        $.get('/user_tags', function (res) {
+
+            var user_tags = res.data;
+            
+            if (res.code === 0) {
+                tags = res.data;
+            }
+
+            $.get('/get_user_tags', function (res) {
+                $.each(user_tags.user, function (k) {
+                    var tag = user_tags.user[k];
+                    if (res.data[tag.id]) {
+                        $user_tags.append('<span class="selected" tag_id='+tag.id+' tag_type="user">'+tag.name+'</span>');
+                    } else {
+                        $user_tags.append('<span class="unselect" tag_id='+tag.id+' tag_type="user">'+tag.name+'</span>');
+                    }
+                });
+                $.each(user_tags['trans.user'], function (k) {
+                    var tag = user_tags['trans.user'][k];
+                    if (res.data[tag.id]) {
+                        $trans_user_tags.append('<span class="selected">'+tag.name+'&nbsp;<strong class="count">'+res.data[tag.id].count+'</strong></span>');
+                    }
+                });
+            });
+        });
+    });
+</script>
+</html>

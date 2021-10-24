@@ -5,6 +5,7 @@ return [
     'midwares' => [
         'default' => 'local',
         'idgenter' => 'local',
+        'idgenter_mongodb' => 'local',
         'lock' => 'local',
     ],
 
