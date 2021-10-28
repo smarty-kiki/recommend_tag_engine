@@ -14,10 +14,13 @@
     }
     div {
         margin: 5px;
-        width: 95%;
+        width: 90%;
     }
     span {
+        vertical-align:middle;
+        display: inline-block;
         margin-right: 3px;
+        margin-bottom: 3px;
         padding: 1px 4px 1px 4px;
     }
     .selected {
@@ -28,7 +31,11 @@
         background-color: #ddd;
     }
     .count {
+        vertical-align:middle;
         color: #ccc;
+    }
+    .good {
+        margin-left: 10px;
     }
     </style>
     <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
@@ -41,20 +48,20 @@
                     <table style="width:100%; height:100%">
                         <tr>
                             <td>
-                                我的标签：
+                                我的标签:
                                 <div id="user_tags"></div>
-                                我的传染标签：
+                                我的传染标签:
                                 <div id="trans_user_tags"></div>
                             </td>
                         </tr>
                         <tr>
                             <td style="vertical-align:bottom;">
-                                获取数据：
+                                获取 Ta:
                                 </br>
-                                <button>随机</button>
-                                <button>喜欢</button>
+                                <button class="random_good">随机</button>
+                                <button class="get_like">喜欢</button>
                                 </br>
-                                链接：
+                                链接:
                                 <div id="good_list">
                                 </div>
                             </td>
@@ -62,8 +69,28 @@
                     </table>
                 </td>
                 <td style="box-shadow: 0px 0px 5px 0px #888888;">
+                    <iframe id="center_web" name="center_web" src="" frameborder="0" style="width: 100%; height: 100%;"></iframe>
                 </td>
                 <td style="width:8%; background-color:#eee;">
+                    <table style="width:100%; height:100%">
+                        <tr>
+                            <td>
+                                Ta 的标签:
+                                <div id="good_tags"></div>
+                                Ta 的传染标签:
+                                <div id="trans_good_tags"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align:bottom;">
+                                标记 Ta:
+                                </br>
+                                <button class="i_like">喜欢并下一个</button>
+                                <button class="next">下一个</button>
+                                </br>
+                            </td>
+                        </tr>
+                    </table>
                 </td>
             </tr>
         </table>
@@ -74,6 +101,79 @@
 
         var $user_tags = $('#user_tags');
         var $trans_user_tags = $('#trans_user_tags');
+        var $good_tags = $('#good_tags');
+        var $trans_good_tags = $('#trans_good_tags');
+        var $good_list = $('#good_list');
+        var now_good_id = null;
+
+        $('body').on('click', '.good', function() {
+            var $this = $(this);
+            now_good_id = $this.attr('good-id');
+
+            $.get('/good_tags', function (res) {
+
+                $good_tags.html('');
+                $trans_good_tags.html('');
+
+                var good_tags = res.data;
+
+                if (res.code === 0) {
+                    tags = res.data;
+                }
+
+                $.get('/get_good_tags/' + now_good_id, function (res) {
+                    $.each(good_tags.good, function (k) {
+                        var tag = good_tags.good[k];
+                        if (res.data[tag.id]) {
+                            $good_tags.append('<span class="selected" tag_id='+tag.id+' tag_type="good">'+tag.name+'</span>');
+                        } else {
+                            $good_tags.append('<span class="unselect" tag_id='+tag.id+' tag_type="good">'+tag.name+'</span>');
+                        }
+                    });
+                    $.each(good_tags['trans.good'], function (k) {
+                        var tag = good_tags['trans.good'][k];
+                        if (res.data[tag.id]) {
+                            $trans_good_tags.append('<span class="selected">'+tag.name+'&nbsp;<strong class="count">'+res.data[tag.id].count+'</strong></span>');
+                        }
+                    });
+                });
+            });
+        });
+
+        $('.random_good').on('click', function () {
+            $.get('/goods', function (res) {
+                var goods = res.data;
+                $good_list.html('');
+                $.each(goods, function (k) {
+                    var good = goods[k];
+                    $good_list.append('<p><a class="good" good-id="'+good.id+'" href="'+good.url+'" target="center_web">'+'['+good.id+']'+good.name+'</a></p>');
+                });
+            });
+            return false;
+        });
+        $('.i_like').on('click', function () {
+            if (now_good_id) {
+                $.post('/mark_like/' + now_good_id, function (res) { });
+            }
+            return false;
+        });
+        $('.get_like').on('click', function () {
+            $.get('/get_like', function (res) {
+                var good_infos = res.data;
+                $good_list.html('');
+                $good_list.append('<strong>我喜欢</strong>');
+                $.each(good_infos.user_like, function (k) {
+                    var good = good_infos.user_like[k];
+                    $good_list.append('<p><a class="good" good-id="'+good.id+'" href="'+good.url+'" target="center_web">'+'['+good.id+']'+good.name+'</a></p>');
+                });
+                $good_list.append('<strong>相似的人喜欢</strong>');
+                $.each(good_infos.good_liked, function (k) {
+                    var good = good_infos.good_liked[k];
+                    $good_list.append('<p><a class="good" good-id="'+good.id+'" href="'+good.url+'" target="center_web">'+'['+good.id+']'+good.name+'</a></p>');
+                });
+            });
+            return false;
+        });
 
         $('body').on('click', '.selected', function(){
             var $this = $(this);
@@ -81,6 +181,13 @@
             var tag_type = $this.attr('tag_type');
             if (tag_type == 'user') {
                 $.post('/tag_targets/delete_from_user', {tag_id:tag_id}, function (res) {
+                    if (res.data) {
+                        $this.addClass('unselect');
+                        $this.removeClass('selected');
+                    }
+                });
+            } else if (tag_type == 'good') {
+                $.post('/tag_targets/delete_from_good/' + now_good_id, {tag_id:tag_id}, function (res) {
                     if (res.data) {
                         $this.addClass('unselect');
                         $this.removeClass('selected');
@@ -100,10 +207,20 @@
                         $this.removeClass('unselect');
                     }
                 });
+            } else if (tag_type == 'good') {
+                $.post('/tag_targets/add_to_good/' + now_good_id, {tag_id:tag_id}, function (res) {
+                    if (res.data) {
+                        $this.addClass('selected');
+                        $this.removeClass('unselect');
+                    }
+                });
             }
         });
 
         $.get('/user_tags', function (res) {
+
+            $user_tags.html('');
+            $trans_user_tags.html('');
 
             var user_tags = res.data;
             

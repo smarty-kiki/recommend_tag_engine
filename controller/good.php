@@ -1,5 +1,15 @@
 <?php
 
+if_get('/get_good_tags/*', function ($good_id)
+{/*{{{*/
+    $tag_targets = db_simple_query_indexed('tag_target', 'tag_id', [
+        'class' => 'good',
+        'class_id' => $good_id
+    ], 'order by count desc');
+
+    return $tag_targets;
+});/*}}}*/
+
 if_get('/goods', function ()
 {/*{{{*/
     return db_simple_query('good');
@@ -49,13 +59,11 @@ if_post('/tag_targets/delete_from_good/*', function ($good_id)
     $good = db_simple_query_first('good', ['id' => $good_id]);
     $tag_id = input('tag_id');
 
-    $tag_targets = db_simple_query_first('tag_target', [
+    $tag_target = db_simple_query_first('tag_target', [
         'tag_id'      => $tag_id,
         'class'       => 'good',
         'class_id'    => $good['id'],
     ]);
-
-    $tag_target = reset($tag_targets);
 
     if ($tag_target) {
 

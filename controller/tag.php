@@ -10,7 +10,10 @@ if_get('/user_tags', function ()
 
 if_get('/good_tags', function ()
 {/*{{{*/
-    return db_simple_query_indexed('tag', 'id', ['type' => ['good', 'trans.good']], 'order by type asc');
+    return [
+        'good' => db_simple_query_indexed('tag', 'id', ['type' => 'good']),
+        'trans.good' => db_simple_query_indexed('tag', 'id', ['type' => 'trans.good']),
+    ];
 });/*}}}*/
 
 if_post('/tags/add', function ()
@@ -98,6 +101,7 @@ if_get('/get_like', function ()
         inner join tag_target ttg on ttg.class_id = g.id and ttg.class = "good"
         inner join tag t on ttg.tag_id = t.trans_tag_id and t.trans_type = "good" and t.type = "trans.user"
         inner join tag_target ttu on t.id = ttu.tag_id and ttu.class = "user" and ttu.class_id = :user_id
+        group by g.id
         order by ttu.count desc
     ', [
         ':user_id' => $user['id'],
@@ -109,6 +113,7 @@ if_get('/get_like', function ()
         inner join tag_target ttg on ttg.class_id = g.id and ttg.class = "good"
         inner join tag t on ttg.tag_id = t.id and t.trans_type = "user" and t.type = "trans.good"
         inner join tag_target ttu on t.trans_tag_id = ttu.tag_id and ttu.class = "user" and ttu.class_id = :user_id
+        group by g.id
         order by ttg.count desc
     ', [
         ':user_id' => $user['id'],
