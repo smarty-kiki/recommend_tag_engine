@@ -15,6 +15,24 @@ if_get('/goods', function ()
     return db_simple_query('good');
 });/*}}}*/
 
+if_get('/last_goods', function ()
+{/*{{{*/
+    $user = current_user();
+
+    $not_show_good_ids = db_simple_query_column('not_show', 'good_id', ['user_id' => $user['id']]);
+
+    $not_show_good_ids[] = 0;
+
+    return db_query('
+        select g.*
+        from good g
+        where id not in :good_ids
+        order by g.id desc limit 10
+    ', [
+        ':good_ids' => $not_show_good_ids,
+    ]);
+});/*}}}*/
+
 if_post('/goods/add', function ()
 {/*{{{*/
     $url = input('url');
@@ -27,6 +45,10 @@ if_post('/goods/add', function ()
 
 if_post('/goods/delete/*', function ($good_id)
 {/*{{{*/
+    db_simple_delete('not_show', [
+        'good_id' => $good_id,
+    ]);
+
     return db_simple_delete('good', [
         'id' => $good_id,
     ]);

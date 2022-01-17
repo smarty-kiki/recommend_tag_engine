@@ -21,7 +21,13 @@ if_post('/tags/add', function ()
     $name = input('name');
     $type = input('type');
 
-    $tag_id = db_simple_insert('tag', compact('name', 'type'));
+    $wheres = compact('name', 'type');
+
+    $tag_id = db_simple_query_value('tag', 'id', $wheres);
+
+    if (! $tag_id) {
+        $tag_id = db_simple_insert('tag', $wheres);
+    }
 
     if ($type === 'user') {
 
@@ -97,9 +103,30 @@ if_post('/mark_like/*', function ($good_id)
     return true;
 });/*}}}*/
 
+if_post('/mark_not_show/*', function ($good_id)
+{/*{{{*/
+    $user = current_user();
+
+    $wheres = [
+        'user_id' => $user['id'],
+        'good_id' => $good_id,
+    ];
+
+    $not_show_id = db_simple_query_value('not_show', 'id', $wheres);
+
+    if (! $not_show_id) {
+        $not_show_id = db_simple_insert('not_show', $wheres);
+    }
+
+    return $not_show_id;
+});/*}}}*/
+
 if_get('/get_like', function ()
 {/*{{{*/
     $user = current_user();
+
+    $not_show_good_ids = db_simple_query_column('not_show', 'good_id', ['user_id' => $user['id']]);
+    $not_show_good_ids[] = 0;
 
     $goods = db_query('
         select g.*
@@ -107,10 +134,13 @@ if_get('/get_like', function ()
         inner join tag_target ttg on ttg.class_id = g.id and ttg.class = "good"
         inner join tag t on ttg.tag_id = t.trans_tag_id and t.trans_type = "good" and t.type = "trans.user"
         inner join tag_target ttu on t.id = ttu.tag_id and ttu.class = "user" and ttu.class_id = :user_id
+        where g.id not in :good_ids
         group by g.id
         order by ttu.count desc
+        limit 10
     ', [
         ':user_id' => $user['id'],
+        ':good_ids' => $not_show_good_ids,
     ]);
 
     $goods2 = db_query('
@@ -119,10 +149,13 @@ if_get('/get_like', function ()
         inner join tag_target ttg on ttg.class_id = g.id and ttg.class = "good"
         inner join tag t on ttg.tag_id = t.id and t.trans_type = "user" and t.type = "trans.good"
         inner join tag_target ttu on t.trans_tag_id = ttu.tag_id and ttu.class = "user" and ttu.class_id = :user_id
+        where g.id not in :good_ids
         group by g.id
         order by ttg.count desc
+        limit 10
     ', [
         ':user_id' => $user['id'],
+        ':good_ids' => $not_show_good_ids,
     ]);
 
     return [

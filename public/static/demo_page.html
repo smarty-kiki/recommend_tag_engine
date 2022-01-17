@@ -58,8 +58,8 @@
                             <td style="vertical-align:bottom;">
                                 获取 Ta:
                                 </br>
-                                <button class="random_good">随机</button>
-                                <button class="get_like">喜欢</button>
+                                <button class="last_good">最新</button>
+                                <button class="get_like">猜喜欢</button>
                                 </br>
                                 链接:
                                 <div id="good_list">
@@ -85,8 +85,8 @@
                             <td style="vertical-align:bottom;">
                                 标记 Ta:
                                 </br>
-                                <button class="i_like">喜欢并下一个</button>
-                                <button class="next">下一个</button>
+                                <button class="i_like">标记喜欢</button>
+                                <button class="next">标记看过</button>
                                 </br>
                             </td>
                         </tr>
@@ -140,8 +140,8 @@
             });
         });
 
-        $('.random_good').on('click', function () {
-            $.get('/goods', function (res) {
+        $('.last_good').on('click', function () {
+            $.get('/last_goods', function (res) {
                 var goods = res.data;
                 $good_list.html('');
                 $.each(goods, function (k) {
@@ -154,6 +154,12 @@
         $('.i_like').on('click', function () {
             if (now_good_id) {
                 $.post('/mark_like/' + now_good_id, function (res) { });
+            }
+            return false;
+        });
+        $('.next').on('click', function () {
+            if (now_good_id) {
+                $.post('/mark_not_show/' + now_good_id, function (res) { });
             }
             return false;
         });
