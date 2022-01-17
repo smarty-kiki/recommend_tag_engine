@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>推荐测试界面</title>
+    <title>推荐界面</title>
     <style>
     * {
         margin: 0px;
@@ -166,6 +166,7 @@
                     var good = good_infos.user_like[k];
                     $good_list.append('<p><a class="good" good-id="'+good.id+'" href="'+good.url+'" target="center_web">'+'['+good.id+']'+good.name+'</a></p>');
                 });
+                $good_list.append('<br>');
                 $good_list.append('<strong>相似的人喜欢</strong>');
                 $.each(good_infos.good_liked, function (k) {
                     var good = good_infos.good_liked[k];

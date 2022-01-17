@@ -47,7 +47,13 @@ if_post('/tags/add', function ()
 
 if_post('/tags/delete/*', function ($tag_id)
 {/*{{{*/
-    return db_simple_delete('tag', ['id' => $tag_id]);
+    $trans_tag_ids = db_simple_query_column('tag', 'id', ['trans_tag_id' => $tag_id]);
+
+    $tag_ids = array_merge($trans_tag_ids, [(int)$tag_id]);
+
+    db_simple_delete('tag_target', ['tag_id' => $tag_ids]);
+
+    return db_simple_delete('tag', ['id' => $tag_ids]);
 });/*}}}*/
 
 if_post('/mark_like/*', function ($good_id)

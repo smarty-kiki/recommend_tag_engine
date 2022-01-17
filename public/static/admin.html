@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>管理界面</title>
+    <style>
+    * {
+        margin: 0px;
+        vertical-align:top;
+        font-size: 12px;
+    }
+    table {
+        width: 100%;
+        text-align: left;
+    }
+    </style>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+</head>
+<body>
+<h1>Ta 管理</h1>
+<table>
+    <thead>
+        <tr>
+            <th width='10%'>Ta 名称</th>
+            <th width='85%'>Ta 图片地址</th>
+            <th width='5%'>操作</th>
+        </tr>
+    </thead>
+    <tbody id="goods">
+    </tbody>
+</table>    
+<table>
+    <tr>
+        <td width='10%'><input id="name" style="width: 95%;" type="text"></input></td>
+        <td width='85%'><input id="url"  style="width: 99%;" type="text"></input></td>
+        <td width='5%'><button id="add">添加</button></td>
+    </tr>
+</table>
+<br>
+<br>
+<br>
+<h1>标签管理</h1>
+<table>
+    <tr>
+        <td>
+            <table>
+                <thead>
+                    <tr>
+                        <td>我的标签</td>
+                        <td>操作</td>
+                    </tr>
+                </thead>
+                <tbody id="user_tags">
+                </tbody>
+            </table>
+            <table>
+                <tr>
+                    <td><input id="user_tag_name" type="text"></input></td>
+                    <td><button id="user_tag_add">添加</button></td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <table>
+                <thead>
+                    <tr>
+                        <td>Ta 的标签</td>
+                        <td>操作</td>
+                    </tr>
+                </thead>
+                <tbody id="good_tags">
+                </tbody>
+            </table>
+            <table>
+                <tr>
+                    <td><input id="good_tag_name" type="text"></input></td>
+                    <td><button id="good_tag_add">添加</button></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<script>
+    $(function () {
+        var $name = $('#name');
+        var $url = $('#url');
+        var $add = $('#add');
+        var $goods = $('#goods');
+        var $user_tags = $('#user_tags');
+        var $good_tags = $('#good_tags');
+        var $user_tag_name = $('#user_tag_name');
+        var $user_tag_add = $('#user_tag_add');
+        var $good_tag_name = $('#good_tag_name');
+        var $good_tag_add = $('#good_tag_add');
+
+        $.get('/goods', function (res) {
+            $.each(res.data, function (i, v) {
+                $goods.append('<tr><td width="10%">'+v.name+'</td><td width="85%">'+v.url+'</td><td width="5%"><button class="delete" good_id="'+v.id+'">删除</button></td></tr>');
+            });
+        });
+
+        $.get('/user_tags', function (res) {
+            $.each(res.data.user, function (i, v) {
+                $user_tags.append('<tr><td>'+v.name+'</td><td><button class="tag_delete" tag_id="'+v.id+'">删除</button></td></tr>');
+            });
+        });
+
+        $.get('/good_tags', function (res) {
+            $.each(res.data.good, function (i, v) {
+                $good_tags.append('<tr><td>'+v.name+'</td><td><button class="tag_delete" tag_id="'+v.id+'">删除</button></td></tr>');
+            });
+        });
+
+        $add.on('click', function () {
+            var name = $name.val();
+            var url = $url.val();
+
+            $.post('/goods/add', {
+                url: url,
+                name: name
+            }, function (res) {
+                var good_id = res.data.id;
+                if (good_id) {
+                    $goods.append('<tr><td width="10%">'+name+'</td><td width="85%">'+url+'</td><td width="5%"><button class="delete" good_id="'+good_id+'">删除</button></td></tr>');
+                    $name.val('');
+                    $url.val('');
+                }
+            });
+        });
+
+        $('body').on('click', '.delete', function () {
+            var $this = $(this);
+            var good_id = $this.attr('good_id');
+
+            if (good_id) {
+                $.post('/goods/delete/'+good_id, function (res) {
+                    if (res.code == 0) {
+                        $this.parents('tr').remove();
+                    }
+                });
+            }
+        });
+
+        $good_tag_add.on('click', function () {
+            var name = $good_tag_name.val();
+
+            $.post('/tags/add', {
+                type: 'good',
+                name: name
+            }, function (res) {
+                var tag_id = res.data.id;
+                if (tag_id) {
+                    $good_tags.append('<tr><td>'+name+'</td><td><button class="tag_delete" tag_id="'+tag_id+'">删除</button></td></tr>');
+                    $good_tag_name.val('');
+                }
+            });
+        });
+
+        $user_tag_add.on('click', function () {
+            var name = $user_tag_name.val();
+
+            $.post('/tags/add', {
+                type: 'user',
+                name: name
+            }, function (res) {
+                var tag_id = res.data.id;
+                if (tag_id) {
+                    $user_tags.append('<tr><td>'+name+'</td><td><button class="tag_delete" tag_id="'+tag_id+'">删除</button></td></tr>');
+                    $user_tag_name.val('');
+                }
+            });
+        });
+
+        $('body').on('click', '.tag_delete', function () {
+            var $this = $(this);
+            var tag_id = $this.attr('tag_id');
+
+            if (tag_id) {
+                $.post('/tags/delete/'+tag_id, function (res) {
+                    if (res.code == 0) {
+                        $this.parent().parent().remove();
+                    }
+                });
+            }
+        });
+
+    });
+</script>
+</body>
+</html>
