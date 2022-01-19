@@ -15,6 +15,15 @@ if_get('/goods', function ()
     return db_simple_query('good');
 });/*}}}*/
 
+if_get('/last_one_good_info', function ()
+{/*{{{*/
+    return db_query('
+        select g.*
+        from good g
+        order by g.id desc limit 1
+        ');
+});/*}}}*/
+
 if_get('/last_goods', function ()
 {/*{{{*/
     $user = current_user();
