@@ -17,10 +17,10 @@ if_get('/goods', function ()
 
 if_get('/last_one_good_info', function ()
 {/*{{{*/
-    return db_query('
+    return db_query_first('
         select g.*
         from good g
-        order by g.id desc limit 1
+        order by g.id desc
         ');
 });/*}}}*/
 
