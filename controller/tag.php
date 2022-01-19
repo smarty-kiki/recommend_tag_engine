@@ -39,7 +39,7 @@ if_post('/tags/add', function ()
         ]);
     } elseif ($type === 'good') {
         $trans_tag_id = db_simple_insert('tag', [
-            'name' => "喜欢'${name}'的",
+            'name' => "喜欢'${name}'",
             'type' => 'trans.user',
             'trans_tag_id' => $tag_id,
             'trans_type' => $type,
