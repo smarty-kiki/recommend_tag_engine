@@ -63,6 +63,19 @@ if_post('/goods/delete/*', function ($good_id)
     ]);
 });/*}}}*/
 
+if_post('/goods/delete_keep_100', function ($good_id)
+{/*{{{*/
+    $good_ids = db_query_column('id', 'select id from good order by id desc limit 101, 1000');
+
+    db_simple_delete('not_show', [
+        'good_id' => $good_ids,
+    ]);
+
+    return db_simple_delete('good', [
+        'id' => $good_ids,
+    ]);
+});/*}}}*/
+
 if_get('/get_good_tags/*', function ($good_id)
 {/*{{{*/
     $good = db_simple_query_first('good', ['id' => $good_id]);
