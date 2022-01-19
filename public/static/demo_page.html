@@ -126,8 +126,9 @@
                         var tag = good_tags.good[k];
                         if (res.data[tag.id]) {
                             $good_tags.append('<span class="selected" tag_id='+tag.id+' tag_type="good">'+tag.name+'</span>');
-                        } else {
-                            $good_tags.append('<span class="unselect" tag_id='+tag.id+' tag_type="good">'+tag.name+'</span>');
+                        } 
+                            else {
+                           // $good_tags.append('<span class="unselect" tag_id='+tag.id+' tag_type="good">'+tag.name+'</span>');
                         }
                     });
                     $.each(good_tags['trans.good'], function (k) {
