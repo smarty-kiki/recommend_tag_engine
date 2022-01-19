@@ -67,6 +67,10 @@ if_post('/goods/delete_keep_100', function ()
 {/*{{{*/
     $good_ids = db_query_column('id', 'select id from good order by id desc limit 101, 1000');
 
+    if (empty($good_ids)) {
+        return [];
+    }
+
     db_simple_delete('not_show', [
         'good_id' => $good_ids,
     ]);
