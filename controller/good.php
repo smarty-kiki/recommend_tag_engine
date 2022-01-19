@@ -63,7 +63,7 @@ if_post('/goods/delete/*', function ($good_id)
     ]);
 });/*}}}*/
 
-if_post('/goods/delete_keep_100', function ($good_id)
+if_post('/goods/delete_keep_100', function ()
 {/*{{{*/
     $good_ids = db_query_column('id', 'select id from good order by id desc limit 101, 1000');
 
