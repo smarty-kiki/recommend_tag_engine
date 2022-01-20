@@ -24,7 +24,7 @@
         var good_id = getUrlParam('good_id');
 
         if (good_id) {
-            $.get('/goods/'+good_id, function (res) {
+            $.get('/goods/extend_id/'+good_id, function (res) {
                 if (res.data.content) {
                     $('body').append(res.data.content);
                 }

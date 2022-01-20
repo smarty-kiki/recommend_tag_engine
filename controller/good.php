@@ -10,6 +10,17 @@ if_get('/get_good_tags/*', function ($good_id)
     return $tag_targets;
 });/*}}}*/
 
+if_get('/goods/extend_id/*', function ($extend_id)
+{/*{{{*/
+    return db_query_first('
+        select g.*
+        from good g
+        where extend_id = :extend_id
+        ', [
+        ':extend_id' => $extend_id,
+        ]);
+});/*}}}*/
+
 if_get('/goods', function ()
 {/*{{{*/
     return db_simple_query('good');
