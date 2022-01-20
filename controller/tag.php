@@ -26,24 +26,26 @@ if_post('/tags/add', function ()
     $tag_id = db_simple_query_value('tag', 'id', $wheres);
 
     if (! $tag_id) {
+
         $tag_id = db_simple_insert('tag', $wheres);
-    }
 
-    if ($type === 'user') {
+        if ($type === 'user') {
 
-        $trans_tag_id = db_simple_insert('tag', [
-            'name' => "'${name}'的人喜欢",
-            'type' => 'trans.good',
-            'trans_tag_id' => $tag_id,
-            'trans_type' => $type,
-        ]);
-    } elseif ($type === 'good') {
-        $trans_tag_id = db_simple_insert('tag', [
-            'name' => "喜欢'${name}'",
-            'type' => 'trans.user',
-            'trans_tag_id' => $tag_id,
-            'trans_type' => $type,
-        ]);
+            $trans_tag_id = db_simple_insert('tag', [
+                'name' => "'${name}'的人喜欢",
+                'type' => 'trans.good',
+                'trans_tag_id' => $tag_id,
+                'trans_type' => $type,
+            ]);
+        } elseif ($type === 'good') {
+            $trans_tag_id = db_simple_insert('tag', [
+                'name' => "喜欢'${name}'",
+                'type' => 'trans.user',
+                'trans_tag_id' => $tag_id,
+                'trans_type' => $type,
+            ]);
+        }
+
     }
 
     return [
