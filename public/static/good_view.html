@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+    img {
+        width: 100%;
+    }
+    </style>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+</head>
+<body>
+</body>
+<script>
+    $(function () {
+
+        function getUrlParam(name) {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+                var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+                if (r != null) return unescape(r[2]); return null; //返回参数值
+        }
+
+        var good_id = getUrlParam('good_id');
+
+        if (good_id) {
+            $.get('/goods/'+good_id, function (res) {
+                if (res.data.content) {
+                    $('body').append(res.data.content);
+                }
+            });
+        }
+    });
+</script>
+</html>

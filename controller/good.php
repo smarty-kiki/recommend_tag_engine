@@ -46,9 +46,11 @@ if_post('/goods/add', function ()
 {/*{{{*/
     $url = input('url');
     $name = input('name');
+    $extend_id = input('extend_id');
+    $content = input('content');
 
     return [
-        'id' => db_simple_insert('good', compact('url', 'name')),
+        'id' => db_simple_insert('good', compact('url', 'name', 'extend_id', 'content')),
     ];
 });/*}}}*/
 
