@@ -21,7 +21,7 @@
                 if (r != null) return unescape(r[2]); return null; //返回参数值
         }
 
-        var good_id = getUrlParam('good_id');
+        var good_id = getUrlParam('extend_id');
 
         if (good_id) {
             $.get('/goods/extend_id/'+good_id, function (res) {
