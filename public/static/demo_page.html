@@ -93,9 +93,7 @@
         var $trans_good_tags = $('#trans_good_tags');
         var now_good_id = null;
 
-        $('body').on('click', '.good', function() {
-            var $this = $(this);
-            now_good_id = $this.attr('good-id');
+        function render_good() {
 
             $.get('/good_tags', function (res) {
 
@@ -113,9 +111,8 @@
                         var tag = good_tags.good[k];
                         if (res.data[tag.id]) {
                             $good_tags.append('<span class="selected" tag_id='+tag.id+' tag_type="good">'+tag.name+'</span>');
-                        }
-                            else {
-                           // $good_tags.append('<span class="unselect" tag_id='+tag.id+' tag_type="good">'+tag.name+'</span>');
+                        } else {
+                            // $good_tags.append('<span class="unselect" tag_id='+tag.id+' tag_type="good">'+tag.name+'</span>');
                         }
                     });
                     $.each(good_tags['trans.good'], function (k) {
@@ -126,7 +123,7 @@
                     });
                 });
             });
-        });
+        }
 
         function next_good() {
 
@@ -136,11 +133,13 @@
                     $.each(good_infos.user_like, function (k) {
                         var good = good_infos.user_like[k];
                         window.frames[0].location.href = good.url;
+                        now_good_id = good.id;
                     });
                 } else if (good_infos.good_liked) {
                     $.each(good_infos.good_liked, function (k) {
                         var good = good_infos.good_liked[k];
                         window.frames[0].location.href = good.url;
+                        now_good_id = good.id;
                     });
                 } else {
                     $.get('/last_goods', function (res) {
@@ -149,6 +148,7 @@
                             $.each(goods, function (k) {
                                 var good = goods[k];
                                 window.frames[0].location.href = good.url;
+                                now_good_id = good.id;
                             });
                         }
                     });
