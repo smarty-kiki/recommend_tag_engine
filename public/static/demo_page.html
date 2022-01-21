@@ -134,12 +134,14 @@
                         var good = good_infos.user_like[k];
                         window.frames[0].location.href = good.url;
                         now_good_id = good.id;
+                        render_good();
                     });
                 } else if (good_infos.good_liked) {
                     $.each(good_infos.good_liked, function (k) {
                         var good = good_infos.good_liked[k];
                         window.frames[0].location.href = good.url;
                         now_good_id = good.id;
+                        render_good();
                     });
                 } else {
                     $.get('/last_goods', function (res) {
@@ -149,6 +151,7 @@
                                 var good = goods[k];
                                 window.frames[0].location.href = good.url;
                                 now_good_id = good.id;
+                                render_good();
                             });
                         }
                     });
