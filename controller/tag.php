@@ -139,7 +139,7 @@ if_get('/get_like', function ()
         where g.id not in :good_ids
         group by g.id
         order by ttu.count desc
-        limit 10
+        limit 1
     ', [
         ':user_id' => $user['id'],
         ':good_ids' => $not_show_good_ids,
@@ -154,7 +154,7 @@ if_get('/get_like', function ()
         where g.id not in :good_ids
         group by g.id
         order by ttg.count desc
-        limit 10
+        limit 1
     ', [
         ':user_id' => $user['id'],
         ':good_ids' => $not_show_good_ids,

@@ -54,18 +54,6 @@
                                 <div id="trans_user_tags"></div>
                             </td>
                         </tr>
-                        <tr>
-                            <td style="vertical-align:bottom;">
-                                获取 Ta:
-                                </br>
-                                <button class="last_good">最新</button>
-                                <button class="get_like">猜喜欢</button>
-                                </br>
-                                链接:
-                                <div id="good_list">
-                                </div>
-                            </td>
-                        </tr>
                     </table>
                 </td>
                 <td style="box-shadow: 0px 0px 5px 0px #888888;">
@@ -103,7 +91,6 @@
         var $trans_user_tags = $('#trans_user_tags');
         var $good_tags = $('#good_tags');
         var $trans_good_tags = $('#trans_good_tags');
-        var $good_list = $('#good_list');
         var now_good_id = null;
 
         $('body').on('click', '.good', function() {
@@ -126,7 +113,7 @@
                         var tag = good_tags.good[k];
                         if (res.data[tag.id]) {
                             $good_tags.append('<span class="selected" tag_id='+tag.id+' tag_type="good">'+tag.name+'</span>');
-                        } 
+                        }
                             else {
                            // $good_tags.append('<span class="unselect" tag_id='+tag.id+' tag_type="good">'+tag.name+'</span>');
                         }
@@ -141,45 +128,49 @@
             });
         });
 
-        $('.last_good').on('click', function () {
-            $.get('/last_goods', function (res) {
-                var goods = res.data;
-                $good_list.html('');
-                $.each(goods, function (k) {
-                    var good = goods[k];
-                    $good_list.append('<p><a class="good" good-id="'+good.id+'" href="'+good.url+'" target="center_web">'+'['+good.id+']'+good.name+'</a></p>');
-                });
+        function next_good() {
+
+            $.get('/get_like', function (res) {
+                var good_infos = res.data;
+                if (good_infos.user_like) {
+                    $.each(good_infos.user_like, function (k) {
+                        var good = good_infos.user_like[k];
+                        window.frames[0].location.href = good.url;
+                    });
+                } else if (good_infos.good_liked) {
+                    $.each(good_infos.good_liked, function (k) {
+                        var good = good_infos.good_liked[k];
+                        window.frames[0].location.href = good.url;
+                    });
+                } else {
+                    $.get('/last_goods', function (res) {
+                        var goods = res.data;
+                        if (goods) {
+                            $.each(goods, function (k) {
+                                var good = goods[k];
+                                window.frames[0].location.href = good.url;
+                            });
+                        }
+                    });
+                }
             });
-            return false;
-        });
+        }
+
         $('.i_like').on('click', function () {
             if (now_good_id) {
                 $.post('/mark_like/' + now_good_id, function (res) { });
+                $.post('/mark_not_show/' + now_good_id, function (res) {
+                    next_good();
+                });
             }
             return false;
         });
         $('.next').on('click', function () {
             if (now_good_id) {
-                $.post('/mark_not_show/' + now_good_id, function (res) { });
+                $.post('/mark_not_show/' + now_good_id, function (res) {
+                    next_good();
+                });
             }
-            return false;
-        });
-        $('.get_like').on('click', function () {
-            $.get('/get_like', function (res) {
-                var good_infos = res.data;
-                $good_list.html('');
-                $good_list.append('<strong>我喜欢</strong>');
-                $.each(good_infos.user_like, function (k) {
-                    var good = good_infos.user_like[k];
-                    $good_list.append('<p><a class="good" good-id="'+good.id+'" href="'+good.url+'" target="center_web">'+'['+good.id+']'+good.name+'</a></p>');
-                });
-                $good_list.append('<br>');
-                $good_list.append('<strong>相似的人喜欢</strong>');
-                $.each(good_infos.good_liked, function (k) {
-                    var good = good_infos.good_liked[k];
-                    $good_list.append('<p><a class="good" good-id="'+good.id+'" href="'+good.url+'" target="center_web">'+'['+good.id+']'+good.name+'</a></p>');
-                });
-            });
             return false;
         });
 
@@ -194,13 +185,13 @@
                         $this.removeClass('selected');
                     }
                 });
-            } else if (tag_type == 'good') {
-                $.post('/tag_targets/delete_from_good/' + now_good_id, {tag_id:tag_id}, function (res) {
-                    if (res.data) {
-                        $this.addClass('unselect');
-                        $this.removeClass('selected');
-                    }
-                });
+           //} else if (tag_type == 'good') {
+           //    $.post('/tag_targets/delete_from_good/' + now_good_id, {tag_id:tag_id}, function (res) {
+           //        if (res.data) {
+           //            $this.addClass('unselect');
+           //            $this.removeClass('selected');
+           //        }
+           //    });
             }
         });
 
@@ -215,13 +206,13 @@
                         $this.removeClass('unselect');
                     }
                 });
-            } else if (tag_type == 'good') {
-                $.post('/tag_targets/add_to_good/' + now_good_id, {tag_id:tag_id}, function (res) {
-                    if (res.data) {
-                        $this.addClass('selected');
-                        $this.removeClass('unselect');
-                    }
-                });
+            //} else if (tag_type == 'good') {
+            //    $.post('/tag_targets/add_to_good/' + now_good_id, {tag_id:tag_id}, function (res) {
+            //        if (res.data) {
+            //            $this.addClass('selected');
+            //            $this.removeClass('unselect');
+            //        }
+            //    });
             }
         });
 
@@ -231,7 +222,7 @@
             $trans_user_tags.html('');
 
             var user_tags = res.data;
-            
+
             if (res.code === 0) {
                 tags = res.data;
             }
@@ -253,6 +244,8 @@
                 });
             });
         });
+
+        next_good();
     });
 </script>
 </html>
